@@ -70,7 +70,7 @@ Esta herramienta utiliza modelos de aprendizaje automático basados en Random Fo
 
 - Serino-β-lactamasa tipo KPC  
 - Coproducción KPC +  MBL (Metalo-β-lactamasas NDM, VIM)   
-- No muestra KPC ni coproducción KPC + MBL  
+- No presenta KPC ni coproducción KPC + MBL  
 
 ---
 
@@ -153,8 +153,8 @@ for i, ab in enumerate(variables):
 def limpiar_clase(clase):
 
     traducciones = {
-        "No_Carbapenemasa": "No muestra KPC ni coproducción KPC + MBL",
-        "No_carbapenemasa": "No muestra KPC ni coproducción KPC + MBL",
+        "No_Carbapenemasa": "No presenta KPC ni coproducción KPC + MBL",
+        "No_carbapenemasa": "No presenta KPC ni coproducción KPC + MBL",
         "KPC": "Serino-β-lactamasas tipo KPC",
         "Coproduccion": "Coproducción KPC + MBL"
     }
