@@ -2,7 +2,7 @@
 """
 Created on Tue Jun 16 16:33:08 2026
 Codigo APP Episeq RAEH
-@author: HAZAM RAEH
+@author: HAZAM DAVID BAQUERO CUERVO RAEH
 """
 import streamlit as st
 import pandas as pd
@@ -68,19 +68,19 @@ Esta herramienta utiliza modelos de aprendizaje automático basados en Random Fo
 
 ### Categorías de clasificación
 
-- Serinobetalactamasa tipo KPC  
-- Coproducción KPC + MBL  
+- Serino-β-lactamasa tipo KPC  
+- Coproducción KPC +  MBL (Metalo-β-lactamasas NDM, VIM)   
 - No muestra KPC ni coproducción KPC + MBL  
 
 ---
 
 ### Selección del modelo
 
-M13: modelo completo con mayor robustez predictiva  
-M5: modelo intermedio recomendado para uso clínico  
+M13: modelo completo con mayor robustez de clasificación  
+M5: modelo intermedio recomendado para un set pequeño de datos
 M3: modelo mínimo para escenarios con datos limitados  
 
-La reducción de MICs puede afectar la capacidad discriminativa del modelo.
+La reducción de datos (MICs) puede afectar la capacidad discriminativa del modelo.
 """)
 
 st.markdown("---")
@@ -155,7 +155,7 @@ def limpiar_clase(clase):
     traducciones = {
         "No_Carbapenemasa": "No muestra KPC ni coproducción KPC + MBL",
         "No_carbapenemasa": "No muestra KPC ni coproducción KPC + MBL",
-        "KPC": "Serinobetalactamasa tipo KPC",
+        "KPC": "Serino-β-lactamasas tipo KPC",
         "Coproduccion": "Coproducción KPC + MBL"
     }
 
