@@ -22,7 +22,7 @@ st.set_page_config(
 # RUTA MODELOS
 # ==================================================
 
-ruta_modelos = r"C:\Users\USUARIO\OneDrive - unbosque.edu.co\RAEH\Episeq\modelos"
+ruta_modelos = "modelos"
 
 modelo_m13 = load(rf"{ruta_modelos}\RF_M13.joblib")
 modelo_m5  = load(rf"{ruta_modelos}\RF_M5.joblib")
