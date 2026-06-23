@@ -22,13 +22,13 @@ st.set_page_config(
 # RUTA MODELOS
 # ==================================================
 
-ruta_modelos = "modelos"
+from joblib import load
 
-modelo_m13 = load(rf"{ruta_modelos}\RF_M13.joblib")
-modelo_m5  = load(rf"{ruta_modelos}\RF_M5.joblib")
-modelo_m3  = load(rf"{ruta_modelos}\RF_M3.joblib")
+modelo_m13 = load("modelos/RF_M13.joblib")
+modelo_m5  = load("modelos/RF_M5.joblib")
+modelo_m3  = load("modelos/RF_M3.joblib")
 
-columnas_modelos = load(rf"{ruta_modelos}\Columnas_Modelos.joblib")
+columnas_modelos = load("modelos/Columnas_Modelos.joblib")
 
 # ==================================================
 # NOMBRES CLÍNICOS ANTIBIÓTICOS
