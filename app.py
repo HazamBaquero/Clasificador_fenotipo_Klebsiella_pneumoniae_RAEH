@@ -6,6 +6,8 @@ Codigo APP Episeq RAEH
 """
 import streamlit as st
 import pandas as pd
+import io
+from io import BytesIO
 from joblib import load
 
 # ==================================================
@@ -120,6 +122,20 @@ variables = columnas_modelos[nombre_modelo]
 st.sidebar.info(f"Modelo: {nombre_modelo}\nVariables: {len(variables)} MICs")
 
 # ==================================================
+# MODO DE USO
+# ==================================================
+
+st.sidebar.title("Modo de uso")
+
+modo = st.sidebar.radio(
+    "Seleccione una opción",
+    [
+        "Clasificación individual",
+        "Clasificación masiva"
+    ]
+)
+
+# ==================================================
 # VALORES MIC
 # ==================================================
 
@@ -128,7 +144,7 @@ mic_values = [0.06,0.12,0.25,0.5,1,2,4,8,16,32,64,128,256]
 # ==================================================
 # INPUT MIC DINÁMICO
 # ==================================================
-
+if modo == "Clasificación individual":
 st.subheader("Ingreso de MICs")
 
 entradas = {}
@@ -221,3 +237,161 @@ st.markdown("---")
 
 st.caption("RAEH - Universidad El Bosque")
 st.caption("Modelo Random Forest para clasificación de carbapenemasas en Klebsiella pneumoniae")
+
+# ==================================================
+# CLASIFICACIÓN MASIVA
+# ==================================================
+
+if modo == "Clasificación masiva":
+
+    st.subheader("Clasificación masiva de aislamientos")
+
+    st.markdown(
+        """
+        Cargue un archivo Excel con múltiples aislamientos.
+        La primera columna debe llamarse **ID** y contener el identificador del aislamiento.
+        """
+    )
+
+    columnas_requeridas = ["ID"] + variables
+
+    st.markdown("### Formato esperado")
+
+    st.code(
+        " | ".join(columnas_requeridas)
+    )
+
+# ==================================================
+# Generar Plantilla
+# =
+    plantilla = pd.DataFrame(
+        columns=columnas_requeridas
+    )
+
+    output = BytesIO()
+
+    with pd.ExcelWriter(
+        output,
+        engine="openpyxl"
+    ) as writer:
+
+        plantilla.to_excel(
+            writer,
+            index=False
+        )
+
+    st.download_button(
+        label=f"Descargar plantilla {nombre_modelo}",
+        data=output.getvalue(),
+        file_name=f"Plantilla_{nombre_modelo}.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+# ==================================================
+# Subir archivo
+# =
+    archivo = st.file_uploader(
+        "Seleccione archivo Excel",
+        type=["xlsx"]
+    )
+# ==================================================
+# Revisar si falta alguna columna dentro del archivo
+# =
+    if archivo is not None:
+
+        df = pd.read_excel(archivo)
+
+        faltantes = [
+            col
+            for col in columnas_requeridas
+            if col not in df.columns
+        ]
+
+        if faltantes:
+
+            st.error(
+                f"Faltan columnas: {', '.join(faltantes)}"
+            )
+
+        else:
+
+            st.success(
+                f"Archivo válido: {len(df)} aislamientos detectados"
+            )
+# ==================================================
+# Boton de clasificación
+# =
+
+            if st.button("Clasificar aislamientos"):
+
+                X = df[variables]
+
+                predicciones = modelo.predict(X)
+
+                probabilidades = modelo.predict_proba(X)
+
+                clases_modelo = modelo.classes_
+
+# ==================================================
+# Agregar resultados
+# =
+                df_resultados = df.copy()
+
+                df_resultados["Clasificacion"] = [
+                    limpiar_clase(p)
+                    for p in predicciones
+                ]
+
+                df_resultados["Confianza (%)"] = (
+                    probabilidades.max(axis=1) * 100
+                ).round(2)
+# ==================================================
+# Guardar probabilidades de cada clase
+# =
+                for i, clase in enumerate(clases_modelo):
+
+                    nombre_columna = (
+                        "Prob_" +
+                        limpiar_clase(clase)
+                    )
+
+                    df_resultados[
+                        nombre_columna
+                    ] = (
+                        probabilidades[:, i] * 100
+                    ).round(2)
+# ==================================================
+# Vista previa
+# =
+                st.subheader(
+                    "Vista previa de resultados"
+                )
+
+                st.dataframe(
+                    df_resultados.head(),
+                    use_container_width=True
+                )
+# ==================================================
+# Generar excel descargable
+# =
+                salida = BytesIO()
+
+                with pd.ExcelWriter(
+                    salida,
+                    engine="openpyxl"
+                ) as writer:
+
+                    df_resultados.to_excel(
+                        writer,
+                        index=False
+                    )
+
+# ==================================================
+# Boton de descarga
+# =
+                st.download_button(
+                    label="Descargar resultados",
+                    data=salida.getvalue(),
+                    file_name=f"Resultados_{nombre_modelo}.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
